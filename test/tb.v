@@ -28,15 +28,11 @@ module tb ();
 `endif
 
   // Replace tt_um_example with your module name:
-  user_project uut(
-
-      // Include power ports for the Gate Level test:
+user_project uut (
 `ifdef GL_TEST
-      .VPWR(VPWR),
-      .VGND(VGND),
+  .VPWR(VPWR), .VGND(VGND),
 `endif
-
-   .ui_in  (ui_in),
+  .ui_in  (ui_in),
   .uo_out (uo_out),
   .uio_in (uio_in),
   .uio_out(uio_out),
@@ -44,6 +40,6 @@ module tb ();
   .ena    (ena),
   .clk    (clk),
   .rst_n  (rst_n)
-  );
+);
 
 endmodule
