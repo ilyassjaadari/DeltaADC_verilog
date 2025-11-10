@@ -6,13 +6,20 @@ SIM ?= icarus
 WAVES ?= 1
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = src
+PROJECT_SOURCES = project.v
 
 ifneq ($(GATES),yes)
 
 # RTL simulation:
 SIM_BUILD				= sim_build/rtl
-VERILOG_SOURCES := $(wildcard $(SRC_DIR)/*.v)
+VERILOG_SOURCES :=  \
+  $(SRC_DIR)/DeltaADC.v \
+  $(SRC_DIR)/StrobeGen.v \
+  $(SRC_DIR)/ADC_fsm.v \
+  $(SRC_DIR)/ADC_value.v \
+  $(SRC_DIR)/ADC_valid_strb.v \
+  $(SRC_DIR)/PWM.v \
+  $(SRC_DIR)/tt_um_deltaadc.v
 
 else
 
