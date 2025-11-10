@@ -21,7 +21,7 @@
 
 `timescale 1ns/1ps
 
-module DeltaADC #(
+module tt_um_DeltaADC #(
     parameter integer W             = 16,   // width of ADC/PWM value
     parameter integer STROBE_CYCLES = 16    // interval between samples (adjust as needed)
 )(
@@ -104,3 +104,4 @@ module DeltaADC #(
     );
 
 endmodule
+
