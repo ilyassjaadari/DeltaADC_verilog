@@ -1,45 +1,48 @@
-// src/user_project.v
+// TinyTapeout wrapper around your core tt_um_DeltaADC
+`default_nettype none
 module user_project (
-    input  wire [7:0] ui_in,     // dip-switches / inputs (LSBs)
-    output wire [7:0] uo_out,    // direct outputs to TB
-    input  wire [7:0] uio_in,    // extra inputs (MSBs)
-    output wire [7:0] uio_out,   // unused -> 0
-    output wire [7:0] uio_oe,    // disable outputs (tri-state)
-    input  wire       ena,       // we map to Comparator_i
-    input  wire       clk,
-    input  wire       rst_n
+    input  wire [7:0] ui_in,     // dedicated inputs
+    output wire [7:0] uo_out,    // dedicated outputs
+    input  wire [7:0] uio_in,    // bidir inputs
+    output wire [7:0] uio_out,   // bidir outputs (unused here)
+    output wire [7:0] uio_oe,    // bidir output enables (1=drive, 0=hi-Z)
+    input  wire       ena,       // design enable
+    input  wire       clk,       // system clock
+    input  wire       rst_n      // active-low reset from TT
 );
-    // --- Wire-ups to your module -------------------------------------------
+    // ---- Parameter match ---------------------------------------------------
     localparam integer W = 16;
 
-    wire             reset_hi      = ~rst_n;                // TB is active-low, your module active-high
-    wire [W-1:0]     period_value  = {uio_in, ui_in};       // MSB: uio_in[7:0], LSB: ui_in[7:0]
-    wire             comparator_i  = ena;                   // simple mapping; change if you prefer another bit
+    // ---- Map TT pins to your core's ports ---------------------------------
+    wire              reset_hi          = ~rst_n;               // TT reset is active-low; your core wants active-high
+    wire [W-1:0]      Period_counter_val = {uio_in, ui_in};     // MSB= uio_in[7:0], LSB= ui_in[7:0]
+    wire              Comparator_i      = ena;                  // simple mapping; change if you prefer a switch bit
 
-    wire [W-1:0]     on_counter_val;
-    wire             adc_valid_strb;
-    wire             pwm_o;
+    wire [W-1:0]      On_counter_val;
+    wire              ADC_valid_strb;
+    wire              PWM_O;
 
-    // --- DUT instantiation --------------------------------------------------
+    // ---- Core instantiation ------------------------------------------------
     tt_um_DeltaADC #(
         .W(W),
-        .STROBE_CYCLES(16)
+        .STROBE_CYCLES(16)   // keep your default, adjust if needed
     ) dut (
         .clk               (clk),
         .reset             (reset_hi),
-        .Period_counter_val(period_value),
-        .Comparator_i      (comparator_i),
-        .On_counter_val    (on_counter_val),
-        .ADC_valid_strb    (adc_valid_strb),
-        .PWM_O             (pwm_o)
+        .Period_counter_val(Period_counter_val),
+        .Comparator_i      (Comparator_i),
+        .On_counter_val    (On_counter_val),
+        .ADC_valid_strb    (ADC_valid_strb),
+        .PWM_O             (PWM_O)
     );
 
-    // --- Expose a compact status on uo_out ---------------------------------
-    assign uo_out[0]   = pwm_o;                 // main PWM out
-    assign uo_out[1]   = adc_valid_strb;        // strobe
-    assign uo_out[7:2] = on_counter_val[5:0];   // low bits for quick observation in TB
+    // ---- Drive TT outputs --------------------------------------------------
+    assign uo_out[0]   = PWM_O;                 // primary observable output
+    assign uo_out[1]   = ADC_valid_strb;        // strobe when value updated
+    assign uo_out[7:2] = On_counter_val[5:0];   // expose low bits for quick view
 
-    // --- Tri-state the bidirectional pins (unused here) ---------------------
+    // ---- Bidir lines unused -> tri-state -----------------------------------
     assign uio_out = 8'h00;
-    assign uio_oe  = 8'h00; // 0 = input / high-Z
+    assign uio_oe  = 8'h00; // 0 = input/high-Z
+
 endmodule
