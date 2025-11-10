@@ -19,7 +19,7 @@ project:
   source_files:
     - "ADC_fsm.v"
     - "ADC_valid_strb.v"
-    - "ADC_value.v "
+    - "ADC_value.v"
     - "PWM.v"
     - "StrobeGen.v"
     - "tb_DeltaADC.v"
