@@ -6,7 +6,6 @@ SIM ?= icarus
 WAVES ?= 1
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = project.v
 
 ifneq ($(GATES),yes)
 
@@ -43,8 +42,8 @@ endif
 COMPILE_ARGS 		+= -I$(SRC_DIR)
 
 # Include the testbench sources:
-VERILOG_SOURCES += $(PWD)/tb_DeltaADC.v
-TOPLEVEL = tb_DeltaADC.v
+VERILOG_SOURCES += $(PWD)/tb_DeltaADC
+TOPLEVEL = tb_DeltaADC
 
 # List test modules to run, separated by commas and without the .py suffix:
 COCOTB_TEST_MODULES = test
