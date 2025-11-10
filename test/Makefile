@@ -6,11 +6,12 @@ SIM ?= icarus
 WAVES ?= 1
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(abspath $(CURDIR)/../src)
-PROJECT_SOURCES =    $(filter-out \
+ALL_SOURCES := $(wildcard $(SRC_DIR)/*.v) $(wildcard $(SRC_DIR)/*.sv)
+PROJECT_SOURCES := $(filter-out \
   $(SRC_DIR)/project.v \
   $(SRC_DIR)/sim.v \
   $(SRC_DIR)/tb_DeltaADC.v, \
-  $(PROJECT_SOURCES))
+  $(ALL_SOURCES))
 
 ifneq ($(GATES),yes)
 
